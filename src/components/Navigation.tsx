@@ -6,12 +6,14 @@ import { Menu, ChevronRight, Sparkles } from "lucide-react";
 import clsx from "clsx";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import AnimatedLogo from "@/components/AnimatedLogo";
 
 type NavItem = {
   id: string;
   label: string;
+  path: string;
 };
 
 export interface NavigationProps {
@@ -23,12 +25,13 @@ export interface NavigationProps {
 }
 
 const DEFAULT_LINKS: NavItem[] = [
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "services", label: "Services" },
-  { id: "portfolio", label: "Portfolio" },
-  { id: "team", label: "Team" },
-  { id: "contact", label: "Contact" },
+  { id: "home", label: "Home", path: "/" },
+  { id: "about", label: "About", path: "/#about" },
+  { id: "services", label: "Services", path: "/#services" },
+  { id: "portfolio", label: "Portfolio", path: "/#portfolio" },
+  { id: "team", label: "Team", path: "/#team" },
+  { id: "careers", label: "Careers", path: "/careers" },
+  { id: "contact", label: "Contact", path: "/#contact" },
 ];
 
 function GlassLogo() {
@@ -64,6 +67,7 @@ export default function Navigation({
   const [activeId, setActiveId] = useState<string>(links[0]?.id ?? "");
   const [scrolled, setScrolled] = useState(false);
   const [isServicesVisible, setIsServicesVisible] = useState(false);
+  const pathname = usePathname();
   const { scrollY } = useScroll();
 
   // OPTIMIZED: Use Framer Motion's optimized scroll handler
@@ -95,8 +99,13 @@ export default function Navigation({
       if (element) observer.observe(element);
     });
 
+    // Detect careers page
+    if (pathname === "/careers") {
+      setActiveId("careers");
+    }
+
     return () => observer.disconnect();
-  }, [links]);
+  }, [links, pathname]);
 
   // OPTIMIZED: Dedicated observer for Services section to hide navbar
   useEffect(() => {
@@ -120,10 +129,25 @@ export default function Navigation({
   }, []);
 
   const handleScrollTo = useCallback(
-    (id: string) => {
+    (id: string, path: string) => {
       if (typeof window === "undefined") return;
+
+      const isHomePage = window.location.pathname === "/";
+      const isSectionLink = path.startsWith("/#");
+
+      if (!isHomePage && isSectionLink) {
+        window.location.href = path;
+        return;
+      }
+
       const el = document.getElementById(id);
-      if (!el) return;
+      if (!el) {
+        if (path.startsWith("/")) {
+          window.location.href = path;
+        }
+        return;
+      }
+
       const rect = el.getBoundingClientRect();
       const absoluteTop = rect.top + window.scrollY;
       const top = Math.max(absoluteTop - scrollOffset, 0);
@@ -139,7 +163,7 @@ export default function Navigation({
         <motion.button
           key={item.id}
           onClick={() => {
-            handleScrollTo(item.id);
+            handleScrollTo(item.id, item.path);
             if (onClick) onClick();
           }}
           whileHover={{ scale: 1.05 }}
@@ -252,7 +276,7 @@ export default function Navigation({
                         >
                           <SheetClose asChild>
                             <button
-                              onClick={() => handleScrollTo(item.id)}
+                              onClick={() => handleScrollTo(item.id, item.path)}
                               className={clsx(
                                 "w-full text-left",
                                 "flex items-center justify-between gap-2",

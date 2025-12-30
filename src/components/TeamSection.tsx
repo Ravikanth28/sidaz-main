@@ -9,10 +9,11 @@ import { useState } from "react";
 
 // Static Imports for Optimization
 import founderImg from "../../public/images/team/founder .jpeg";
+import sushmiImg from "../../public/images/team/sushmi.png";
 import shrutiImg from "../../public/images/team/Shruti.jpeg";
 import arjunImg from "../../public/images/team/arjun.png";
 import mothyImg from "../../public/images/team/mothy.png";
-import suriyaImg from "../../public/images/team/suriya.png";
+import suriyaImg from "../../public/images/team/suriya.jpeg";
 import rakaImg from "../../public/images/team/raka.png";
 import dhineshImg from "../../public/images/team/dhinesh.png";
 
@@ -42,6 +43,17 @@ const teamMembers: TeamMember[] = [
   },
   {
     id: "2",
+    name: "Sushmi",
+    role: "Co-Founder & Software Developer",
+    image: sushmiImg,
+    email: "msushmidhasush@gmail.com",
+    linkedin: "https://www.linkedin.com/in/sushmidha06",
+    instagram: "https://www.instagram.com/mysticaldimple006_/?hl=en",
+    bio: "Strategic innovator and co-architect of SIDAZ's vision, dedicated to building human-centric technology solutions with a focus on full-stack development.",
+    expertise: ["Development", "Strategy", "Operations"]
+  },
+  {
+    id: "3",
     name: "Shruti",
     role: "Chief Executive Officer",
     image: shrutiImg,
@@ -52,7 +64,7 @@ const teamMembers: TeamMember[] = [
     expertise: ["Leadership", "Strategy", "Growth"]
   },
   {
-    id: "3",
+    id: "4",
     name: "Arjun",
     role: "Chief Technology Officer",
     image: arjunImg,
@@ -63,7 +75,7 @@ const teamMembers: TeamMember[] = [
     expertise: ["AI/ML", "Cloud", "Architecture"]
   },
   {
-    id: "4",
+    id: "5",
     name: "Mordheeshvara",
     role: "Chief Marketing Officer",
     image: mothyImg,
@@ -74,7 +86,7 @@ const teamMembers: TeamMember[] = [
     expertise: ["Branding", "Growth", "Analytics"]
   },
   {
-    id: "5",
+    id: "6",
     name: "Pratheeb",
     role: "Chief Financial Officer",
     image: suriyaImg,
@@ -85,7 +97,7 @@ const teamMembers: TeamMember[] = [
     expertise: ["Finance", "Strategy", "Analytics"]
   },
   {
-    id: "6",
+    id: "7",
     name: "Ravikanth",
     role: "Chief Blockchain Developer",
     image: rakaImg,
@@ -96,7 +108,7 @@ const teamMembers: TeamMember[] = [
     expertise: ["Blockchain", "Web3", "Security"]
   },
   {
-    id: "7",
+    id: "8",
     name: "Dhinesh",
     role: "Chief Operating Officer",
     image: dhineshImg,
@@ -119,12 +131,12 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
       whileHover={{ y: -5 }}
       className="group relative cursor-pointer"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 transition-all duration-500 hover:border-violet-500/50 hover:bg-white/10 will-change-transform">
+      <div className="relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 transition-all duration-500 group-hover:border-violet-500/50 group-hover:bg-white/[0.08] group-hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.2)] will-change-transform">
         {/* Tech Corner Accents */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white/20 rounded-tl-2xl group-hover:border-violet-500 transition-colors" />
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white/20 rounded-br-2xl group-hover:border-violet-500 transition-colors" />
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-[1px] border-l-[1px] border-white/20 rounded-tl-2xl group-hover:border-violet-500/50 transition-colors z-20" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-[1px] border-r-[1px] border-white/20 rounded-br-2xl group-hover:border-violet-500/50 transition-colors z-20" />
         {/* Image Container */}
-        <div className="relative aspect-square overflow-hidden">
+        <div className="relative aspect-[4/5] overflow-hidden">
           <div className="relative w-full h-full">
             <Image
               src={member.image}
@@ -133,26 +145,28 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
               sizes="(max-width: 768px) 100vw, 50vw"
               placeholder="blur"
               priority={index < 4}
-              quality={80}
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              quality={90}
+              className="object-cover object-[center_20%] transition-transform duration-1000 group-hover:scale-110"
             />
+            {/* Subtle Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </div>
 
-          {/* Founder Badge */}
-          {member.role === "Founder" && (
-            <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/10 border border-white/20 z-10">
-              <span className="text-[10px] font-bold text-white uppercase tracking-wider">Founder</span>
+          {/* Role Badge - Premium Glassmorphism */}
+          {(member.role.includes("Founder")) && (
+            <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 z-10 shadow-xl">
+              <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{member.role.split(" & ")[0]}</span>
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="p-5">
+        <div className="p-6">
           <div className="mb-2">
-            <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">
+            <h3 className="text-xl font-bold text-white group-hover:text-violet-400 transition-colors duration-300">
               {member.name}
             </h3>
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em] mt-1">
               {member.role}
             </p>
           </div>
