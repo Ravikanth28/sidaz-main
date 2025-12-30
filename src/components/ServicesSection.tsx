@@ -308,89 +308,123 @@ export default function ServicesSection({ className }: { className?: string }) {
       {/* Modal with Shared Layout Animation */}
       <AnimatePresence onExitComplete={() => setModalOpen(false)}>
         {selectedService && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 overflow-y-auto outline-none">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.1 }}
               onClick={handleCloseModal}
-              className="absolute inset-0 bg-black/90" // No blur, faster
+              className="fixed inset-0 bg-black/95 backdrop-blur-2xl"
             />
 
             <motion.div
               layoutId={`service-${selectedService.id}`}
-              className="relative w-full max-w-3xl bg-zinc-900 rounded-3xl overflow-hidden border border-white/10 z-10 flex flex-col max-h-[90vh] will-change-transform" // Removed shadow-2xl, added will-change
-              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }} // Apple-style ease
+              className="relative w-full max-w-4xl bg-zinc-900 rounded-[2.5rem] overflow-hidden border border-white/10 z-10 flex flex-col max-h-[90vh] shadow-[0_0_50px_rgba(0,0,0,1)] will-change-transform"
+              transition={{
+                layout: {
+                  type: "spring",
+                  stiffness: 800,
+                  damping: 50,
+                  mass: 0.4,
+                  delay: 0
+                }
+              }}
             >
               <button
                 onClick={handleCloseModal}
-                className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors border border-white/10"
+                className="absolute top-6 right-6 z-20 p-2.5 rounded-full bg-black/50 hover:bg-white hover:text-black text-white transition-all border border-white/10"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className={cn("h-32 w-full bg-gradient-to-b opacity-20 shrink-0", selectedService.gradient)} />
+              <div className={cn("h-40 w-full bg-gradient-to-b opacity-20 shrink-0", selectedService.gradient)} />
 
-              <div className="p-8 md:p-10 overflow-y-auto custom-scrollbar">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
-                      <selectedService.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl md:text-4xl font-bold text-white mb-1">
+              <div className="p-8 md:p-12 overflow-y-auto custom-scrollbar">
+                <div className="grid md:grid-cols-[1fr_300px] gap-12">
+                  <div className="space-y-8">
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2, duration: 0.5 }}
+                    >
+                      <div className="w-20 h-20 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center mb-6">
+                        <selectedService.icon className="w-10 h-10 text-white" />
+                      </div>
+                      <h3 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
                         {selectedService.title}
                       </h3>
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2">
                         {selectedService.tags.map((tag) => (
-                          <span key={tag} className="px-2.5 py-0.5 text-xs font-medium text-zinc-300 bg-white/5 rounded-full border border-white/10">
+                          <span key={tag} className="px-3 py-1 text-xs font-bold text-zinc-400 bg-white/5 border border-white/10 rounded-full tracking-wider uppercase">
                             {tag}
                           </span>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </motion.div>
 
-                  <p className="text-xl text-zinc-300 leading-relaxed mb-8">
-                    {selectedService.details}
-                  </p>
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                      className="text-xl text-zinc-300 leading-relaxed font-medium"
+                    >
+                      {selectedService.details}
+                    </motion.p>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">Key Features</h4>
-                      <ul className="space-y-3">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4, duration: 0.5 }}
+                    >
+                      <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-[0.2em] mb-6">Industrial Capabilities</h4>
+                      <ul className="grid gap-4">
                         {selectedService.features.map((feature, i) => (
-                          <li key={i} className="flex items-start gap-3 text-zinc-300">
-                            <CheckCircle2 className="w-5 h-5 text-violet-500 shrink-0 mt-0.5" />
-                            <span>{feature}</span>
+                          <li key={i} className="flex items-center gap-4 text-zinc-300 bg-white/[0.02] border border-white/5 p-4 rounded-2xl hover:bg-white/[0.05] transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-violet-600/20 flex items-center justify-center shrink-0">
+                              <CheckCircle2 className="w-4 h-4 text-violet-500" />
+                            </div>
+                            <span className="font-medium">{feature}</span>
                           </li>
                         ))}
                       </ul>
-                    </div>
+                    </motion.div>
+                  </div>
 
-                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
-                      <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">Why Choose Us?</h4>
-                      <p className="text-zinc-400 text-sm leading-relaxed mb-4">
-                        We don't just deliver code; we deliver outcomes. Our team integrates deeply with yours to ensure the solution we build drives real business growth.
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    className="space-y-6"
+                  >
+                    <div className="bg-white/5 rounded-3xl p-8 border border-white/5">
+                      <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Strategic Advantage</h4>
+                      <p className="text-zinc-400 text-sm leading-relaxed mb-8">
+                        Our engineering team doesn't just build features; we build competitive moats. Every line of code is optimized for scale, security, and market performance.
                       </p>
                       <button
                         onClick={() => {
                           handleCloseModal();
                           document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="w-full py-3 rounded-xl bg-white text-black font-bold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-4 rounded-2xl bg-white text-black font-bold hover:bg-zinc-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group/btn shadow-[0_10px_30px_rgba(255,255,255,0.1)]"
                       >
-                        <span>Start Project</span>
-                        <ArrowUpRight className="w-4 h-4" />
+                        <span>Start Your Project</span>
+                        <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                       </button>
                     </div>
-                  </div>
-                </motion.div>
+
+                    <div className="p-8 rounded-3xl border border-white/5 bg-gradient-to-br from-violet-600/10 to-transparent">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Zap className="w-5 h-5 text-violet-400" />
+                        <span className="text-sm font-bold text-white uppercase tracking-wider text-[10px]">Fast Delivery</span>
+                      </div>
+                      <p className="text-zinc-400 text-xs leading-relaxed">
+                        Initial MVP architecture delivered in under 4 weeks with production-grade stability.
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>

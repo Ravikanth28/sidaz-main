@@ -153,16 +153,27 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
+      layoutId={`team-member-${member.id}`}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ delay: 0.1, duration: 0.5 }}
+      transition={{
+        opacity: { duration: 0.4, delay: 0.1 },
+        y: { duration: 0.4, delay: 0.1 },
+        layout: {
+          type: "spring",
+          stiffness: 800,
+          damping: 50,
+          mass: 0.4,
+          delay: 0
+        }
+      }}
       style={{ perspective: 1000 }}
       className="group relative cursor-pointer"
     >
       <motion.div
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative overflow-hidden rounded-[2rem] bg-zinc-900 border border-white/5 transition-colors duration-500 group-hover:border-violet-500/50 group-hover:bg-zinc-800/80 will-change-transform transform-gpu shadow-2xl"
+        className="relative overflow-hidden rounded-[2.5rem] bg-zinc-900 border border-white/5 transition-colors duration-500 group-hover:border-violet-500/50 group-hover:bg-zinc-800/80 will-change-transform transform-gpu shadow-2xl"
       >
         <motion.div
           style={{
@@ -173,8 +184,8 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
           }}
           className="absolute inset-0 z-30 pointer-events-none"
         />
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-[1px] border-l-[1px] border-white/10 rounded-tl-[2rem] group-hover:border-violet-500/30 transition-colors z-20" />
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-[1px] border-r-[1px] border-white/20 rounded-br-[2rem] group-hover:border-violet-500/30 transition-colors z-20" />
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-[1px] border-l-[1px] border-white/10 rounded-tl-[2.5rem] group-hover:border-violet-500/30 transition-colors z-20" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-[1px] border-r-[1px] border-white/20 rounded-br-[2.5rem] group-hover:border-violet-500/30 transition-colors z-20" />
         <div className="relative aspect-[4/5] overflow-hidden">
           <div className="relative w-full h-full transform-gpu transition-transform duration-700 group-hover:scale-105">
             <Image
@@ -205,7 +216,7 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
             </p>
           </div>
           <div className="flex items-center gap-2 mt-6 pt-6 border-t border-white/5 text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-white transition-colors">
-            <span>View Details</span>
+            <span>View Immersive Profile</span>
             <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
           </div>
         </div>
@@ -294,78 +305,89 @@ export default function TeamSection() {
       {/* Detail Modal */}
       <AnimatePresence onExitComplete={() => setModalOpen(false)}>
         {selectedMember && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-          >
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 overflow-y-auto outline-none">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
               onClick={handleCloseModal}
-              className="absolute inset-0 bg-black/95" // Removed blur, increased opacity
+              className="fixed inset-0 bg-black/95 backdrop-blur-2xl"
             />
 
             <motion.div
-              initial={{ opacity: 0, scaleY: 0.9 }}
-              animate={{ opacity: 1, scaleY: 1 }}
-              exit={{ opacity: 0, scaleY: 0.9 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-4xl bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10 z-10 flex flex-col md:flex-row max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible will-change-transform origin-center"
+              layoutId={`team-member-${selectedMember.id}`}
+              className="relative w-full max-w-5xl bg-zinc-900 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] border border-white/10 z-10 flex flex-col md:flex-row max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible will-change-transform origin-center"
+              transition={{
+                layout: {
+                  type: "spring",
+                  stiffness: 800,
+                  damping: 50,
+                  mass: 0.4,
+                  delay: 0
+                }
+              }}
             >
               <button
                 onClick={handleCloseModal}
-                className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors border border-white/10"
+                className="absolute top-6 right-6 z-20 p-2.5 rounded-full bg-black/50 hover:bg-white hover:text-black text-white transition-all border border-white/10"
               >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Image Side */}
-              <div className="relative w-full md:w-2/5 h-64 md:h-auto shrink-0">
-                <div className="relative w-full h-full">
+              <div className="relative w-full md:w-2/5 h-80 md:h-[600px] shrink-0 overflow-hidden">
+                <motion.div
+                  initial={{ scale: 1.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="relative w-full h-full"
+                >
                   <Image
                     src={selectedMember.image}
                     alt={selectedMember.name}
                     fill
                     priority
                     placeholder="blur"
-                    quality={80}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    quality={95}
+                    sizes="(max-width: 768px) 100vw, 40vw"
                     className="object-cover"
                   />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent md:bg-gradient-to-r" />
+                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent md:bg-gradient-to-r" />
               </div>
 
               {/* Content Side */}
-              <div className="flex-1 p-8 md:p-10 flex flex-col justify-center">
-                <div className="mb-6">
-                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                    {selectedMember.name}
-                  </h3>
-                  <p className="text-sm font-bold text-emerald-400 uppercase tracking-wider">
-                    {selectedMember.role}
-                  </p>
-                </div>
-
+              <div className="flex-1 p-8 md:p-14 flex flex-col justify-center">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <p className="text-zinc-300 leading-relaxed mb-8 text-lg">
+                  <div className="mb-8">
+                    <h3 className="text-4xl md:text-6xl font-bold text-white mb-3 tracking-tight">
+                      {selectedMember.name}
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-bold text-emerald-400 uppercase tracking-[0.3em]">
+                        • {selectedMember.role}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-zinc-300 leading-relaxed mb-10 text-xl font-medium">
                     {selectedMember.bio}
                   </p>
 
-                  <div className="mb-8">
-                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Expertise</h4>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mb-10">
+                    <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] mb-6">Mastery & Expertise</h4>
+                    <div className="flex flex-wrap gap-3">
                       {selectedMember.expertise.map((skill) => (
                         <span
                           key={skill}
-                          className="px-3 py-1.5 text-sm font-medium text-zinc-300 bg-white/5 rounded-full border border-white/10"
+                          className="px-4 py-2 text-sm font-bold text-zinc-300 bg-white/5 rounded-2xl border border-white/10 hover:border-violet-500/30 transition-colors"
                         >
                           {skill}
                         </span>
@@ -373,20 +395,20 @@ export default function TeamSection() {
                     </div>
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex flex-wrap gap-4 items-center">
                     <a
                       href={`mailto:${selectedMember.email}`}
-                      className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black font-bold hover:bg-zinc-200 transition-colors"
+                      className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-black font-bold hover:bg-zinc-200 transition-all active:scale-[0.98] shadow-[0_10px_30px_rgba(255,255,255,0.1)]"
                     >
-                      <Mail className="w-4 h-4" />
-                      <span>Get in Touch</span>
+                      <Mail className="w-5 h-5" />
+                      <span>Initiate Contact</span>
                     </a>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       {selectedMember.linkedin && (
                         <a
                           href={selectedMember.linkedin}
-                          className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/10 hover:border-white/30"
+                          className="p-4 rounded-2xl bg-white/5 hover:bg-white text-white hover:text-black transition-all border border-white/10 hover:border-white shadow-xl"
                         >
                           <Linkedin className="w-5 h-5" />
                         </a>
@@ -394,7 +416,7 @@ export default function TeamSection() {
                       {selectedMember.instagram && (
                         <a
                           href={selectedMember.instagram}
-                          className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/10 hover:border-white/30"
+                          className="p-4 rounded-2xl bg-white/5 hover:bg-white text-white hover:text-black transition-all border border-white/10 hover:border-white shadow-xl"
                         >
                           <Instagram className="w-5 h-5" />
                         </a>
@@ -404,7 +426,7 @@ export default function TeamSection() {
                 </motion.div>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </section>

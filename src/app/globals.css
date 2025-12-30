@@ -58,6 +58,29 @@
     --theme-violet: #663399;
     --theme-violet-rgb: 102, 51, 153;
   }
+
+  /* Light theme overrides */
+  [data-theme="light"] {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 220 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 70% 55%;
+    --secondary-foreground: 0 0% 0%;
+    --accent: 180 80% 50%;
+    --accent-foreground: 0 0% 0%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 220 80% 50%;
+  }
 }
 
 @layer base {
@@ -167,6 +190,16 @@
 }
 
 @layer utilities {
+
+  /* Hover effect utility */
+  .hover-effect {
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+  }
 
   /* Premium gradient text */
   .gradient-text {

@@ -31,6 +31,7 @@ export default function MagneticButton({
 
     return (
         <motion.div
+            className={`hover-effect ${className}`}
             style={{ position: "relative" }}
             ref={ref}
             onMouseMove={handleMouse}

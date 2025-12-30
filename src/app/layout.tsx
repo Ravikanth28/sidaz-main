@@ -8,6 +8,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import CanvasWrapper from "@/components/canvas/CanvasWrapper";
 import { ModalProvider } from "@/context/ModalContext";
 import CustomCursor from "@/components/ui/CustomCursor";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "sidaz",
@@ -34,6 +35,7 @@ export default function RootLayout({
           data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
         />
         <CustomCursor />
+        <ThemeToggle />
         <ModalProvider>
           <SmoothScroll>
             <CanvasWrapper>

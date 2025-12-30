@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from
 import { Briefcase, GraduationCap, MapPin, Clock, Users, ArrowRight, Mail, Sparkles, CheckCircle2, X, ArrowUpRight } from "lucide-react";
 import { jobRoles, internships, JobRole } from "@/data/careers-data";
 import { cn } from "@/lib/utils";
+import { useModal } from "@/context/ModalContext";
 
 function JobCard({ job, onClick }: { job: JobRole; onClick: () => void }) {
     const cardRef = useRef<HTMLDivElement>(null);
@@ -36,6 +37,15 @@ function JobCard({ job, onClick }: { job: JobRole; onClick: () => void }) {
             onMouseLeave={handleMouseLeave}
             layoutId={`job-${job.id}`}
             onClick={onClick}
+            transition={{
+                layout: {
+                    type: "spring",
+                    stiffness: 800,
+                    damping: 50,
+                    mass: 0.4,
+                    delay: 0
+                }
+            }}
             style={{ perspective: 1000 }}
             className="group relative cursor-pointer"
         >
@@ -177,6 +187,7 @@ function InternshipCard({ intern, onApply }: { intern: any; onApply: (t: string,
 export default function CareersSection() {
     const [activeTab, setActiveTab] = useState<"jobs" | "internships">("jobs");
     const [selectedJob, setSelectedJob] = useState<JobRole | null>(null);
+    const { setModalOpen } = useModal();
 
     const COMPANY_EMAIL = "sidaztechnologies@gmail.com";
 
@@ -273,7 +284,10 @@ export default function CareersSection() {
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             {jobRoles.map((job) => (
-                                <JobCard key={job.id} job={job} onClick={() => setSelectedJob(job)} />
+                                <JobCard key={job.id} job={job} onClick={() => {
+                                    setSelectedJob(job);
+                                    setModalOpen(true);
+                                }} />
                             ))}
                         </motion.div>
                     ) : (
@@ -298,83 +312,107 @@ export default function CareersSection() {
             </section>
 
             {/* Detail Modal for Job Roles */}
-            <AnimatePresence>
+            <AnimatePresence onExitComplete={() => setModalOpen(false)}>
                 {selectedJob && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 overflow-y-auto outline-none">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
+                            transition={{ duration: 0.1 }}
                             onClick={() => setSelectedJob(null)}
-                            className="absolute inset-0 bg-black/90"
+                            className="fixed inset-0 bg-black/95 backdrop-blur-2xl"
                         />
 
                         <motion.div
                             layoutId={`job-${selectedJob.id}`}
-                            className="relative w-full max-w-3xl bg-zinc-900 rounded-[2.5rem] overflow-hidden border border-white/10 z-10 flex flex-col max-h-[90vh] will-change-transform"
-                            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                            className="relative w-full max-w-4xl bg-zinc-900 rounded-[3rem] overflow-hidden border border-white/10 z-10 flex flex-col max-h-[90vh] shadow-[0_0_50px_rgba(0,0,0,1)] will-change-transform"
+                            transition={{
+                                layout: {
+                                    type: "spring",
+                                    stiffness: 800,
+                                    damping: 50,
+                                    mass: 0.4,
+                                    delay: 0
+                                }
+                            }}
                         >
                             <button
                                 onClick={() => setSelectedJob(null)}
-                                className="absolute top-6 right-6 z-20 p-2.5 rounded-full bg-black/50 hover:bg-white hover:text-black text-white transition-all border border-white/10"
+                                className="absolute top-8 right-8 z-20 p-2.5 rounded-full bg-black/50 hover:bg-white hover:text-black text-white transition-all border border-white/10"
                             >
                                 <X className="w-5 h-5" />
                             </button>
 
-                            <div className="h-32 w-full bg-gradient-to-b from-violet-600/20 to-transparent shrink-0" />
+                            <div className="h-40 w-full bg-gradient-to-b from-violet-600/20 to-transparent shrink-0" />
 
-                            <div className="px-8 pb-10 md:px-12 overflow-y-auto custom-scrollbar">
+                            <div className="px-8 pb-12 md:px-14 overflow-y-auto custom-scrollbar">
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.2, duration: 0.5 }}
                                 >
-                                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                                        <div>
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <span className="px-3 py-1 rounded-full bg-violet-600/10 text-violet-400 text-[10px] font-bold uppercase tracking-widest border border-violet-500/20">
+                                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+                                        <div className="space-y-6">
+                                            <div className="flex items-center gap-4">
+                                                <span className="px-4 py-1.5 rounded-full bg-violet-600/10 text-violet-400 text-[10px] font-black uppercase tracking-[0.2em] border border-violet-500/20">
                                                     {selectedJob.type}
                                                 </span>
-                                                <span className="text-zinc-500 text-xs font-medium uppercase tracking-widest flex items-center gap-1.5">
-                                                    <MapPin className="w-3 h-3" />
+                                                <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+                                                    <MapPin className="w-3.5 h-3.5" />
                                                     {selectedJob.location}
                                                 </span>
                                             </div>
-                                            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter">
+                                            <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tight">
                                                 {selectedJob.title}
                                             </h2>
                                         </div>
                                     </div>
 
-                                    <div className="grid md:grid-cols-3 gap-12">
-                                        <div className="md:col-span-2 space-y-8">
-                                            <div>
-                                                <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Role Overview</h4>
-                                                <p className="text-lg text-zinc-300 leading-relaxed">
+                                    <div className="grid lg:grid-cols-[1fr_350px] gap-16">
+                                        <div className="space-y-12">
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.3 }}
+                                            >
+                                                <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] mb-6">Mission & Impact</h4>
+                                                <p className="text-xl text-zinc-300 leading-relaxed font-medium">
                                                     {selectedJob.details}
                                                 </p>
-                                            </div>
+                                            </motion.div>
 
-                                            <div>
-                                                <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Key Responsibilities</h4>
-                                                <ul className="space-y-4">
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.4 }}
+                                            >
+                                                <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] mb-6">Core Responsibilities</h4>
+                                                <div className="grid gap-4">
                                                     {selectedJob.features.map((feature, i) => (
-                                                        <li key={i} className="flex items-start gap-3 text-zinc-400">
-                                                            <CheckCircle2 className="w-5 h-5 text-violet-500 shrink-0 mt-0.5" />
-                                                            <span className="leading-relaxed">{feature}</span>
-                                                        </li>
+                                                        <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
+                                                            <div className="w-8 h-8 rounded-full bg-violet-600/20 flex items-center justify-center shrink-0 mt-1">
+                                                                <CheckCircle2 className="w-4 h-4 text-violet-500" />
+                                                            </div>
+                                                            <span className="text-zinc-300 leading-relaxed font-medium">{feature}</span>
+                                                        </div>
                                                     ))}
-                                                </ul>
-                                            </div>
+                                                </div>
+                                            </motion.div>
                                         </div>
 
-                                        <div className="space-y-8">
-                                            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/5">
-                                                <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-6">Requirements</h4>
-                                                <ul className="space-y-3">
+                                        <motion.div
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.5 }}
+                                            className="space-y-8"
+                                        >
+                                            <div className="p-8 rounded-[2rem] bg-white/[0.03] border border-white/10 backdrop-blur-md">
+                                                <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-8 border-b border-white/5 pb-4">Job Requirements</h4>
+                                                <ul className="space-y-5">
                                                     {selectedJob.requirements.map((req, i) => (
-                                                        <li key={i} className="text-sm text-zinc-400 flex items-center gap-2">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                                                        <li key={i} className="text-sm text-zinc-400 flex items-center gap-3 font-medium">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-500/50" />
                                                             {req}
                                                         </li>
                                                     ))}
@@ -386,12 +424,16 @@ export default function CareersSection() {
                                                     handleApply(selectedJob.title, selectedJob.type);
                                                     setSelectedJob(null);
                                                 }}
-                                                className="w-full py-4 rounded-2xl bg-white text-black font-bold hover:bg-violet-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl"
+                                                className="group/btn w-full py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-violet-600 hover:text-white transition-all duration-500 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(139,92,246,0.2)] active:scale-[0.98]"
                                             >
-                                                Apply Now
-                                                <ArrowUpRight className="w-4 h-4" />
+                                                Submit Application
+                                                <ArrowUpRight className="w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                                             </button>
-                                        </div>
+
+                                            <p className="text-center text-zinc-500 text-[9px] font-bold uppercase tracking-widest">
+                                                Standard response time: 24-48 Hours
+                                            </p>
+                                        </motion.div>
                                     </div>
                                 </motion.div>
                             </div>
