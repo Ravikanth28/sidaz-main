@@ -120,24 +120,63 @@ const teamMembers: TeamMember[] = [
   }
 ];
 
+import { useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useRef } from "react";
+
 function TeamCard({ member, index, onClick }: { member: TeamMember; index: number; onClick: () => void }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  // Ultra-smooth springs for no-lag feel
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 25, mass: 0.5 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 25, mass: 0.5 });
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+  const shineX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
+  const shineY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    x.set((e.clientX - rect.left) / rect.width - 0.5);
+    y.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       onClick={onClick}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: 0.1, duration: 0.5 }}
-      whileHover={{ y: -5 }}
+      style={{ perspective: 1000 }}
       className="group relative cursor-pointer"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 transition-all duration-500 group-hover:border-violet-500/50 group-hover:bg-white/[0.08] group-hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.2)] will-change-transform">
-        {/* Tech Corner Accents */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-[1px] border-l-[1px] border-white/20 rounded-tl-2xl group-hover:border-violet-500/50 transition-colors z-20" />
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-[1px] border-r-[1px] border-white/20 rounded-br-2xl group-hover:border-violet-500/50 transition-colors z-20" />
-        {/* Image Container */}
+      <motion.div
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="relative overflow-hidden rounded-[2rem] bg-zinc-900 border border-white/5 transition-colors duration-500 group-hover:border-violet-500/50 group-hover:bg-zinc-800/80 will-change-transform transform-gpu shadow-2xl"
+      >
+        <motion.div
+          style={{
+            background: useTransform(
+              [shineX, shineY],
+              ([sx, sy]) => `radial-gradient(circle at ${sx} ${sy}, rgba(255,255,255,0.1) 0%, transparent 80%)`
+            ),
+          }}
+          className="absolute inset-0 z-30 pointer-events-none"
+        />
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-[1px] border-l-[1px] border-white/10 rounded-tl-[2rem] group-hover:border-violet-500/30 transition-colors z-20" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-[1px] border-r-[1px] border-white/20 rounded-br-[2rem] group-hover:border-violet-500/30 transition-colors z-20" />
         <div className="relative aspect-[4/5] overflow-hidden">
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full transform-gpu transition-transform duration-700 group-hover:scale-105">
             <Image
               src={member.image}
               alt={member.name}
@@ -146,38 +185,31 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
               placeholder="blur"
               priority={index < 4}
               quality={90}
-              className="object-cover object-[center_20%] transition-transform duration-1000 group-hover:scale-110"
+              className="object-cover object-[center_20%]"
             />
-            {/* Subtle Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
           </div>
-
-          {/* Role Badge - Premium Glassmorphism */}
-          {(member.role.includes("Founder")) && (
-            <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 z-10 shadow-xl">
+          {member.role.includes("Founder") && (
+            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 z-10 shadow-2xl">
               <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{member.role.split(" & ")[0]}</span>
             </div>
           )}
         </div>
-
-        {/* Content */}
-        <div className="p-6">
-          <div className="mb-2">
-            <h3 className="text-xl font-bold text-white group-hover:text-violet-400 transition-colors duration-300">
+        <div className="p-8 relative z-40">
+          <div className="mb-4">
+            <h3 className="text-2xl font-bold text-white group-hover:text-violet-400 transition-colors duration-300">
               {member.name}
             </h3>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em] mt-1">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mt-2">
               {member.role}
             </p>
           </div>
-
-          {/* View Profile Hint */}
-          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5 text-xs font-medium text-zinc-400 group-hover:text-white transition-colors">
-            <span>View Profile</span>
-            <ArrowUpRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+          <div className="flex items-center gap-2 mt-6 pt-6 border-t border-white/5 text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-white transition-colors">
+            <span>View Details</span>
+            <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
           </div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -200,7 +232,6 @@ export default function TeamSection() {
 
   return (
     <section
-      id="team"
       className="relative w-full min-h-screen flex items-center justify-center py-32 overflow-hidden bg-transparent"
     >
       {/* 3D Background */}

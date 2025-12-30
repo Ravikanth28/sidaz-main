@@ -11,6 +11,7 @@ const ServicesSection = dynamic(() => import("@/components/ServicesSection"), { 
 const AboutSection = dynamic(() => import("@/components/AboutSection"), { ssr: true });
 const PortfolioSection = dynamic(() => import("@/components/PortfolioSection"), { ssr: true });
 const TeamSection = dynamic(() => import("@/components/TeamSection"), { ssr: true });
+const CareersSection = dynamic(() => import("@/components/CareersSection"), { ssr: true });
 const ContactSection = dynamic(() => import("@/components/ContactSection"), { ssr: true });
 const Footer = dynamic(() => import("@/components/Footer"), { ssr: true });
 
@@ -56,6 +57,11 @@ export default function HomePage() {
         {/* Team Section */}
         <div id="team" className="scroll-mt-20 gpu-accelerate">
           <TeamSection />
+        </div>
+
+        {/* Careers Section */}
+        <div id="careers" className="scroll-mt-20 gpu-accelerate">
+          <CareersSection />
         </div>
 
         {/* Contact Section */}

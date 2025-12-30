@@ -4,11 +4,10 @@ import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, ChevronRight, Sparkles } from "lucide-react";
 import clsx from "clsx";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import AnimatedLogo from "@/components/AnimatedLogo";
 
 type NavItem = {
   id: string;
@@ -30,7 +29,7 @@ const DEFAULT_LINKS: NavItem[] = [
   { id: "services", label: "Services", path: "/#services" },
   { id: "portfolio", label: "Portfolio", path: "/#portfolio" },
   { id: "team", label: "Team", path: "/#team" },
-  { id: "careers", label: "Careers", path: "/careers" },
+  { id: "careers", label: "Careers", path: "/#careers" },
   { id: "contact", label: "Contact", path: "/#contact" },
 ];
 
@@ -45,7 +44,6 @@ function GlassLogo() {
         className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
         priority
       />
-      {/* Glow effect */}
       <div
         className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
         style={{
@@ -57,6 +55,49 @@ function GlassLogo() {
   );
 }
 
+const NavLink = ({
+  item,
+  isActive,
+  handleScrollTo,
+  onClick
+}: {
+  item: NavItem;
+  isActive: boolean;
+  handleScrollTo: (id: string, path: string) => void;
+  onClick?: () => void;
+}) => {
+  return (
+    <motion.button
+      onClick={() => {
+        handleScrollTo(item.id, item.path);
+        if (onClick) onClick();
+      }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={clsx(
+        "relative inline-flex items-center justify-center h-10 px-6 rounded-full",
+        "text-sm font-medium transition-all duration-300 touch-manipulation",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/60",
+        isActive
+          ? "text-white"
+          : "text-gray-300 hover:text-white hover:bg-white/5"
+      )}
+      aria-current={isActive ? "page" : undefined}
+      aria-label={`Go to ${item.label}`}
+    >
+      <span className="min-w-0 truncate relative z-10">{item.label}</span>
+      {isActive && (
+        <motion.span
+          layoutId="activeNav"
+          className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-[0_0_20px_rgba(102,51,153,0.5)]"
+          initial={false}
+          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+        />
+      )}
+    </motion.button>
+  );
+};
+
 export default function Navigation({
   className,
   style,
@@ -64,19 +105,17 @@ export default function Navigation({
   logo,
   scrollOffset = 80,
 }: NavigationProps) {
-  const [activeId, setActiveId] = useState<string>(links[0]?.id ?? "");
+  const [activeId, setActiveId] = useState<string>("");
   const [scrolled, setScrolled] = useState(false);
   const [isServicesVisible, setIsServicesVisible] = useState(false);
   const pathname = usePathname();
   const { scrollY } = useScroll();
 
-  // OPTIMIZED: Use Framer Motion's optimized scroll handler
   useMotionValueEvent(scrollY, "change", (latest) => {
     const isScrolled = latest > 20;
     if (isScrolled !== scrolled) setScrolled(isScrolled);
   });
 
-  // OPTIMIZED: Use IntersectionObserver for active section detection instead of scroll listener
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -89,7 +128,7 @@ export default function Navigation({
         });
       },
       {
-        rootMargin: "-50% 0px -50% 0px", // Trigger when section is in middle of viewport
+        rootMargin: "-50% 0px -50% 0px",
         threshold: 0,
       }
     );
@@ -99,15 +138,9 @@ export default function Navigation({
       if (element) observer.observe(element);
     });
 
-    // Detect careers page
-    if (pathname === "/careers") {
-      setActiveId("careers");
-    }
-
     return () => observer.disconnect();
   }, [links, pathname]);
 
-  // OPTIMIZED: Dedicated observer for Services section to hide navbar
   useEffect(() => {
     const servicesSection = document.getElementById('services');
     if (!servicesSection) return;
@@ -119,8 +152,8 @@ export default function Navigation({
         });
       },
       {
-        rootMargin: "0px", // Exact viewport intersection
-        threshold: 0.1 // Trigger when 10% of services is visible
+        rootMargin: "0px",
+        threshold: 0.1
       }
     );
 
@@ -156,44 +189,6 @@ export default function Navigation({
     [scrollOffset]
   );
 
-  const NavLink = useCallback(
-    ({ item, onClick }: { item: NavItem; onClick?: () => void }) => {
-      const isActive = activeId === item.id;
-      return (
-        <motion.button
-          key={item.id}
-          onClick={() => {
-            handleScrollTo(item.id, item.path);
-            if (onClick) onClick();
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={clsx(
-            "relative inline-flex items-center justify-center h-10 px-6 rounded-full",
-            "text-sm font-medium transition-all duration-300 touch-manipulation",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/60",
-            isActive
-              ? "text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-[0_0_20px_rgba(102,51,153,0.5)]"
-              : "text-gray-300 hover:text-white hover:bg-white/5"
-          )}
-          aria-current={isActive ? "page" : undefined}
-          aria-label={`Go to ${item.label}`}
-        >
-          <span className="min-w-0 truncate relative z-10">{item.label}</span>
-          {isActive && (
-            <motion.span
-              layoutId="activeNav"
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600"
-              initial={false}
-              transition={{ type: "spring", stiffness: 380, damping: 30 }}
-            />
-          )}
-        </motion.button>
-      );
-    },
-    [activeId, handleScrollTo]
-  );
-
   return (
     <motion.header
       role="navigation"
@@ -210,15 +205,13 @@ export default function Navigation({
       )}
       style={style}
     >
-      {/* OPTIMIZED: Removed infinite background animations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30" >
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
         <div className="absolute -top-20 left-1/4 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl" />
         <div className="absolute -top-20 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
-      </div >
+      </div>
 
       <div className="container w-full max-w-full relative z-10">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Left: Logo */}
           <Link
             href="/"
             className="group flex items-center gap-2 sm:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/60 rounded-lg p-1 ml-2 sm:ml-4 min-w-0 flex-shrink-0"
@@ -227,14 +220,17 @@ export default function Navigation({
             {logo ?? <GlassLogo />}
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1 min-w-0 flex-1 justify-center max-w-2xl mx-8">
             {links.map((item) => (
-              <NavLink key={item.id} item={item} />
+              <NavLink
+                key={item.id}
+                item={item}
+                isActive={activeId === item.id}
+                handleScrollTo={handleScrollTo}
+              />
             ))}
           </nav>
 
-          {/* Right: Mobile Menu */}
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <Sheet>
               <SheetTrigger asChild>
@@ -252,7 +248,6 @@ export default function Navigation({
                 className="w-[90vw] max-w-sm bg-gradient-to-br from-slate-950 via-violet-950/20 to-slate-950 backdrop-blur-md border-l border-violet-500/30 p-0 flex flex-col"
                 aria-label="Mobile menu"
               >
-                {/* Mobile Menu Background */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -306,7 +301,6 @@ export default function Navigation({
         </div>
       </div>
 
-      {/* Glowing Bottom Border - Optimized */}
       <motion.div
         className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent will-change-transform"
         animate={{
@@ -318,6 +312,6 @@ export default function Navigation({
           ease: "easeInOut"
         }}
       />
-    </motion.header >
+    </motion.header>
   );
 }

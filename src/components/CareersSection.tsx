@@ -1,10 +1,178 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Briefcase, GraduationCap, MapPin, Clock, Users, ArrowRight, Mail, Sparkles, CheckCircle2, X, ArrowUpRight } from "lucide-react";
 import { jobRoles, internships, JobRole } from "@/data/careers-data";
 import { cn } from "@/lib/utils";
+
+function JobCard({ job, onClick }: { job: JobRole; onClick: () => void }) {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const mouseXSpring = useSpring(x);
+    const mouseYSpring = useSpring(y);
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
+    const shineX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
+    const shineY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        x.set((e.clientX - rect.left) / rect.width - 0.5);
+        y.set((e.clientY - rect.top) / rect.height - 0.5);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            layoutId={`job-${job.id}`}
+            onClick={onClick}
+            style={{ perspective: 1000 }}
+            className="group relative cursor-pointer"
+        >
+            <motion.div
+                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                className="relative p-8 rounded-[2.5rem] bg-zinc-900 border border-white/5 group-hover:border-violet-500/30 transition-colors duration-500 overflow-hidden shadow-2xl will-change-transform transform-gpu"
+            >
+                {/* Interactive Shine */}
+                <motion.div
+                    style={{
+                        background: useTransform(
+                            [shineX, shineY],
+                            ([sx, sy]) => `radial-gradient(circle at ${sx} ${sy}, rgba(255,255,255,0.08) 0%, transparent 80%)`
+                        ),
+                    }}
+                    className="absolute inset-0 z-30 pointer-events-none"
+                />
+
+                <div className="relative z-10 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <span className={cn(
+                            "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                            job.type === "Remote" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                                job.type === "Hybrid" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                                    "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        )}>
+                            {job.type}
+                        </span>
+                        <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-medium uppercase tracking-widest">
+                            <MapPin className="w-3 h-3" />
+                            {job.location}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-2xl font-bold text-white group-hover:text-violet-400 transition-colors mb-2">
+                            {job.title}
+                        </h3>
+                        <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">
+                            {job.description}
+                        </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                        {job.requirements.slice(0, 2).map((req, i) => (
+                            <span key={i} className="px-2.5 py-1 text-[10px] font-medium text-zinc-500 bg-white/5 border border-white/5 rounded-full">
+                                {req}
+                            </span>
+                        ))}
+                    </div>
+
+                    <div className="pt-4 flex items-center gap-2 text-violet-400 text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                        View Details
+                        <ArrowRight className="w-3 h-3" />
+                    </div>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+function InternshipCard({ intern, onApply }: { intern: any; onApply: (t: string, ty: string) => void }) {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const mouseXSpring = useSpring(x);
+    const mouseYSpring = useSpring(y);
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
+    const shineX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
+    const shineY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        x.set((e.clientX - rect.left) / rect.width - 0.5);
+        y.set((e.clientY - rect.top) / rect.height - 0.5);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{ perspective: 1000 }}
+            className="group relative"
+        >
+            <motion.div
+                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                className="relative p-8 rounded-[2.5rem] bg-zinc-900 border border-white/5 hover:border-violet-500/30 transition-colors duration-500 shadow-2xl overflow-hidden will-change-transform transform-gpu"
+            >
+                <motion.div
+                    style={{
+                        background: useTransform(
+                            [shineX, shineY],
+                            ([sx, sy]) => `radial-gradient(circle at ${sx} ${sy}, rgba(255,255,255,0.08) 0%, transparent 80%)`
+                        ),
+                    }}
+                    className="absolute inset-0 z-30 pointer-events-none"
+                />
+
+                <div className="space-y-6 relative z-10">
+                    <div className="flex items-center justify-between">
+                        <div className="p-2 rounded-xl bg-violet-600/10 border border-violet-500/20">
+                            <GraduationCap className="w-5 h-5 text-violet-400" />
+                        </div>
+                        <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+                            <Clock className="w-3 h-3" />
+                            {intern.duration}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className="text-xl font-bold text-white mb-2">{intern.title}</h4>
+                        <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-3">Mentorship: {intern.mentorship}</p>
+                        <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">
+                            {intern.description}
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => onApply(intern.title, "Internship")}
+                        className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300"
+                    >
+                        Apply Now
+                        <Mail className="w-3.5 h-3.5" />
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
 
 export default function CareersSection() {
     const [activeTab, setActiveTab] = useState<"jobs" | "internships">("jobs");
@@ -22,64 +190,75 @@ export default function CareersSection() {
     };
 
     return (
-        <div className="py-20 space-y-20 min-h-screen">
-            {/* Hero Section */}
-            <section className="container mx-auto px-4 text-center max-w-4xl pt-20">
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-8"
-                >
-                    <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-                    <span className="text-xs font-bold text-violet-400 uppercase tracking-widest">Join our Mission</span>
-                </motion.div>
+        <section className="py-32 relative overflow-hidden">
+            <div className="container mx-auto px-4 z-10 relative">
+                {/* Section Header */}
+                <div className="text-center max-w-3xl mx-auto mb-20">
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6"
+                    >
+                        <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                        <span className="text-xs font-bold text-violet-400 uppercase tracking-widest">Join our Mission</span>
+                    </motion.div>
 
-                <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1, duration: 0.5 }}
-                    className="text-5xl md:text-7xl font-bold text-white mb-8 tracking-tighter"
-                >
-                    Your Journey <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-500 font-extrabold">
-                        Starts Here.
-                    </span>
-                </motion.h1>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight"
+                    >
+                        Your Journey <span className="text-zinc-500">Starts Here.</span>
+                    </motion.h2>
 
-                {/* Tab Switcher */}
-                <div className="flex justify-center mt-12 mb-16">
-                    <div className="relative p-1.5 bg-zinc-900 border border-white/10 rounded-2xl flex gap-2">
-                        <button
-                            onClick={() => setActiveTab("jobs")}
-                            className={`relative z-10 px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === "jobs" ? "text-black" : "text-zinc-400 hover:text-white"
-                                }`}
-                        >
-                            Professional Roles
-                            {activeTab === "jobs" && (
-                                <motion.div
-                                    layoutId="activeTabIndicator"
-                                    className="absolute inset-0 bg-white rounded-xl -z-10"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
-                                />
-                            )}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("internships")}
-                            className={`relative z-10 px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === "internships" ? "text-black" : "text-zinc-400 hover:text-white"
-                                }`}
-                        >
-                            Internship Program
-                            {activeTab === "internships" && (
-                                <motion.div
-                                    layoutId="activeTabIndicator"
-                                    className="absolute inset-0 bg-white rounded-xl -z-10"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
-                                />
-                            )}
-                        </button>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="text-lg text-zinc-400 max-w-xl mx-auto"
+                    >
+                        We're looking for visionaries to help us define the future of technology and design.
+                    </motion.p>
+
+                    {/* Tab Switcher */}
+                    <div className="flex justify-center mt-12">
+                        <div className="relative p-1.5 bg-zinc-900 border border-white/10 rounded-2xl flex gap-2">
+                            <button
+                                onClick={() => setActiveTab("jobs")}
+                                className={`relative z-10 px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === "jobs" ? "text-black" : "text-zinc-400 hover:text-white"
+                                    }`}
+                            >
+                                Professional Roles
+                                {activeTab === "jobs" && (
+                                    <motion.div
+                                        layoutId="activeTabIndicator"
+                                        className="absolute inset-0 bg-white rounded-xl -z-10"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                                    />
+                                )}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("internships")}
+                                className={`relative z-10 px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === "internships" ? "text-black" : "text-zinc-400 hover:text-white"
+                                    }`}
+                            >
+                                Internship Program
+                                {activeTab === "internships" && (
+                                    <motion.div
+                                        layoutId="activeTabIndicator"
+                                        className="absolute inset-0 bg-white rounded-xl -z-10"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                                    />
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
             {/* Content Section */}
             <section className="container mx-auto px-4 max-w-6xl relative min-h-[400px]">
@@ -94,53 +273,7 @@ export default function CareersSection() {
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             {jobRoles.map((job) => (
-                                <motion.div
-                                    key={job.id}
-                                    layoutId={`job-${job.id}`}
-                                    onClick={() => setSelectedJob(job)}
-                                    className="group relative p-8 rounded-3xl bg-zinc-900 border border-white/5 hover:border-violet-500/30 transition-all duration-500 cursor-pointer overflow-hidden"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-violet-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                                    <div className="relative z-10 space-y-6">
-                                        <div className="flex items-center justify-between">
-                                            <span className={cn(
-                                                "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-                                                job.type === "Remote" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                                                    job.type === "Hybrid" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
-                                                        "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                                            )}>
-                                                {job.type}
-                                            </span>
-                                            <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-medium uppercase tracking-widest">
-                                                <MapPin className="w-3 h-3" />
-                                                {job.location}
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <h3 className="text-xl font-bold text-white group-hover:text-violet-400 transition-colors mb-2">
-                                                {job.title}
-                                            </h3>
-                                            <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">
-                                                {job.description}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex flex-wrap gap-2">
-                                            {job.requirements.slice(0, 2).map((req, i) => (
-                                                <span key={i} className="px-2.5 py-1 text-[10px] font-medium text-zinc-500 bg-white/5 border border-white/5 rounded-full">
-                                                    {req}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        <div className="pt-4 flex items-center gap-2 text-violet-400 text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                                            View Details
-                                            <ArrowRight className="w-3 h-3" />
-                                        </div>
-                                    </div>
-                                </motion.div>
+                                <JobCard key={job.id} job={job} onClick={() => setSelectedJob(job)} />
                             ))}
                         </motion.div>
                     ) : (
@@ -153,38 +286,11 @@ export default function CareersSection() {
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
                             {internships.map((intern) => (
-                                <div
+                                <InternshipCard
                                     key={intern.id}
-                                    className="group relative p-8 rounded-3xl bg-zinc-900 border border-white/5 hover:border-violet-500/30 transition-all duration-500"
-                                >
-                                    <div className="space-y-6">
-                                        <div className="flex items-center justify-between">
-                                            <div className="p-2 rounded-xl bg-violet-600/10 border border-violet-500/20">
-                                                <GraduationCap className="w-5 h-5 text-violet-400" />
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
-                                                <Clock className="w-3 h-3" />
-                                                {intern.duration}
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <h4 className="text-lg font-bold text-white mb-2">{intern.title}</h4>
-                                            <p className="text-xs text-violet-400 font-bold uppercase tracking-wider mb-3">Mentorship: {intern.mentorship}</p>
-                                            <p className="text-zinc-400 text-sm leading-relaxed">
-                                                {intern.description}
-                                            </p>
-                                        </div>
-
-                                        <button
-                                            onClick={() => handleApply(intern.title, "Internship")}
-                                            className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white hover:text-black transition-all duration-300"
-                                        >
-                                            Apply Now
-                                            <Mail className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
+                                    intern={intern}
+                                    onApply={handleApply}
+                                />
                             ))}
                         </motion.div>
                     )}
@@ -359,6 +465,6 @@ export default function CareersSection() {
                     </div>
                 </div>
             </section>
-        </div>
+        </section>
     );
 }
