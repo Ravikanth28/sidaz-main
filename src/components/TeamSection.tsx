@@ -8,7 +8,7 @@ import TeamScene from "@/components/canvas/TeamScene";
 import { useState } from "react";
 
 // Static Imports for Optimization
-import founderImg from "../../public/images/team/founder .jpeg";
+import founderImg from "../../public/images/team/founder.jpeg";
 import sushmiImg from "../../public/images/team/sushmi.png";
 import shrutiImg from "../../public/images/team/Shruti.jpeg";
 import arjunImg from "../../public/images/team/arjun.png";

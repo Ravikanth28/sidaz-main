@@ -32,7 +32,7 @@ export default function AboutSection() {
   const founder = {
     name: "Sarathy",
     role: "Founder",
-    image: "/images/team/founder .jpeg",
+    image: "/images/team/founder.jpeg",
     bio: "Visionary entrepreneur who founded SIDAZ with a mission to revolutionize digital experiences through cutting-edge technology and exceptional design. With a passion for innovation and excellence, Sarathy leads the company towards transforming ideas into reality."
   };
 
@@ -99,10 +99,12 @@ export default function AboutSection() {
                   <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
                   <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 group-hover:border-violet-500/50 transition-all">
                     <Image
-                      src="/images/team/founder .jpeg" // Matches actual filename
+                      src="/images/team/founder.jpeg"
                       alt={founder.name}
                       fill
-                      className="object-cover"
+                      className="object-cover object-[center_20%]"
+                      sizes="(max-width: 768px) 192px, 192px"
+                      quality={95}
                     />
                   </div>
                 </div>
