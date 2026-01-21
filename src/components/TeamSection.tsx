@@ -32,9 +32,9 @@ type TeamMember = {
 const teamMembers: TeamMember[] = [
   {
     id: "1",
-    name: "Sarathy",
+    name: "Ravikanth",
     role: "Founder",
-    image: founderImg,
+    image: rakaImg,
     email: "sarathy@sidaz.com",
     linkedin: "https://www.linkedin.com/in/sarathyvaittianadasammy/",
     instagram: "https://www.instagram.com/parama_from_petit/?hl=en",
@@ -65,26 +65,16 @@ const teamMembers: TeamMember[] = [
   },
   {
     id: "4",
-    name: "Arjun",
+    name: "Mordheeshvara",
     role: "Chief Technology Officer",
-    image: arjunImg,
+    image: mothyImg,
     email: "arjunfree256@gmail.com",
     linkedin: "https://www.linkedin.com/in/arjun19/",
     instagram: "https://www.instagram.com/arj._.uun/?hl=en",
     bio: "Technology visionary architecting scalable systems with AI, ML, and cloud-native solutions.",
     expertise: ["AI/ML", "Cloud", "Architecture"]
   },
-  {
-    id: "5",
-    name: "Mordheeshvara",
-    role: "Chief Marketing Officer",
-    image: mothyImg,
-    email: "mordheeshvarab@gmail.com",
-    linkedin: "https://www.linkedin.com/in/mordheeshvara/",
-    instagram: "https://www.instagram.com/mordheesh/?hl=en",
-    bio: "Creative strategist building iconic brands through compelling narratives and data-driven campaigns.",
-    expertise: ["Branding", "Growth", "Analytics"]
-  },
+
   {
     id: "6",
     name: "Pratheeb",
@@ -117,7 +107,18 @@ const teamMembers: TeamMember[] = [
     instagram: "https://www.instagram.com/itz_dhinesh_05/?hl=en",
     bio: "Operations excellence leader optimizing workflows and ensuring flawless project delivery.",
     expertise: ["Operations", "Process", "Delivery"]
-  }
+  },
+  {
+    id: "5",
+    name: "Mordheeshvara",
+    role: "Chief Marketing Officer",
+    image: mothyImg,
+    email: "mordheeshvarab@gmail.com",
+    linkedin: "https://www.linkedin.com/in/mordheeshvara/",
+    instagram: "https://www.instagram.com/mordheesh/?hl=en",
+    bio: "Creative strategist building iconic brands through compelling narratives and data-driven campaigns.",
+    expertise: ["Branding", "Growth", "Analytics"]
+  },
 ];
 
 import { useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -173,13 +174,13 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
     >
       <motion.div
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative overflow-hidden rounded-[2.5rem] bg-zinc-900 border border-white/5 transition-colors duration-500 group-hover:border-violet-500/50 group-hover:bg-zinc-800/80 will-change-transform transform-gpu shadow-2xl"
+        className="relative overflow-hidden rounded-[2.5rem] bg-white/[0.03] backdrop-blur-3xl border border-white/10 transition-all duration-700 group-hover:border-violet-500/50 group-hover:bg-white/[0.05] will-change-transform transform-gpu shadow-2xl"
       >
         <motion.div
           style={{
             background: useTransform(
               [shineX, shineY],
-              ([sx, sy]) => `radial-gradient(circle at ${sx} ${sy}, rgba(255,255,255,0.1) 0%, transparent 80%)`
+              ([sx, sy]) => `radial-gradient(circle at ${sx} ${sy}, rgba(255,255,255,0.08) 0%, transparent 60%)`
             ),
           }}
           className="absolute inset-0 z-30 pointer-events-none"
@@ -198,7 +199,7 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
               quality={90}
               className="object-cover object-[center_20%]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
           </div>
           {member.role.includes("Founder") && (
             <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 z-10 shadow-2xl">
@@ -208,16 +209,16 @@ function TeamCard({ member, index, onClick }: { member: TeamMember; index: numbe
         </div>
         <div className="p-8 relative z-40">
           <div className="mb-4">
-            <h3 className="text-2xl font-bold text-white group-hover:text-violet-400 transition-colors duration-300">
+            <h3 className="text-3xl font-bold text-white group-hover:text-violet-400 transition-colors duration-300 tracking-tight leading-tight">
               {member.name}
             </h3>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mt-2">
+            <p className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] mt-3">
               {member.role}
             </p>
           </div>
-          <div className="flex items-center gap-2 mt-6 pt-6 border-t border-white/5 text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-white transition-colors">
-            <span>View Immersive Profile</span>
-            <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+          <div className="flex items-center gap-2 mt-8 pt-8 border-t border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition-all duration-300">
+            <span className="group-hover:translate-x-1 transition-transform">Explore Profile</span>
+            <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
           </div>
         </div>
       </motion.div>
@@ -317,7 +318,7 @@ export default function TeamSection() {
 
             <motion.div
               layoutId={`team-member-${selectedMember.id}`}
-              className="relative w-full max-w-5xl bg-zinc-900 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] border border-white/10 z-10 flex flex-col md:flex-row max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible will-change-transform origin-center"
+              className="relative w-full max-w-5xl bg-zinc-950/80 backdrop-blur-3xl rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)] border border-white/20 z-10 flex flex-col md:flex-row max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible will-change-transform origin-center"
               transition={{
                 layout: {
                   type: "spring",
@@ -355,7 +356,7 @@ export default function TeamSection() {
                     className="object-cover"
                   />
                 </motion.div>
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent md:bg-gradient-to-r" />
+                <div className="absolute inset-0 bg-zinc-900/10" />
               </div>
 
               {/* Content Side */}
@@ -371,8 +372,9 @@ export default function TeamSection() {
                       {selectedMember.name}
                     </h3>
                     <div className="flex items-center gap-3">
-                      <p className="text-sm font-bold text-emerald-400 uppercase tracking-[0.3em]">
-                        • {selectedMember.role}
+                      <p className="text-sm font-black text-emerald-400 uppercase tracking-[0.4em] flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        {selectedMember.role}
                       </p>
                     </div>
                   </div>
@@ -398,9 +400,9 @@ export default function TeamSection() {
                   <div className="flex flex-wrap gap-4 items-center">
                     <a
                       href={`mailto:${selectedMember.email}`}
-                      className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-black font-bold hover:bg-zinc-200 transition-all active:scale-[0.98] shadow-[0_10px_30px_rgba(255,255,255,0.1)]"
+                      className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-white text-black font-black uppercase tracking-wider hover:bg-zinc-100 transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(255,255,255,0.15)] group/btn"
                     >
-                      <Mail className="w-5 h-5" />
+                      <Mail className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
                       <span>Initiate Contact</span>
                     </a>
 
